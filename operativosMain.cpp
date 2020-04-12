@@ -210,6 +210,7 @@ Animal readNewAnimal()
 
     //Se recibe el input del usuario para inicializar los valores del registro
     cout << "Digite el nombre de la mascota: " << endl;
+    cin.ignore(INT_MAX, '\n');
     strcpy(newAnimal.name, getAndVerifyString(32).c_str());
     string newAnimalNameLowercase = newAnimal.name;
 
