@@ -645,7 +645,10 @@ string getUserMenuSelection()
     return menuSelection;
 }
 
+//Variable que indica si el programa debe continuar
 bool working = true;
+
+//Ejecutar la operación ingresada por el usuario
 void doOperation(int userSelection)
 {
     clearConsole();
