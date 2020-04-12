@@ -172,8 +172,6 @@ void generateAnimals()
 
         animalsArray[i] = newMascot;
 
-        transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return tolower(c); });
-
         mint nameHash = hashString(name);
 
         if (firstPositionOfHash.find(nameHash) == firstPositionOfHash.end())
