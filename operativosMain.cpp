@@ -39,7 +39,7 @@ struct Animal
 };
 
 //Función para imprimir un registro
-int printAnimal(struct Animal *data)
+void printAnimal(struct Animal *data)
 {
     printf("|%10d|%32s|%32s|%10d|%16s|%10d|%12.1f|%4c|\n", data->id, data->name, data->type, data->age, data->race, data->height, data->weight, data->sex);
 }
@@ -65,7 +65,8 @@ mint hashString(string s)
     mint ans = ZERO;
     for (int i = 1; i < s.length() + 1; i++)
     {
-        if(s[i-1] >= 'A' && s[i-1] <= 'Z')s[i-1] = tolower(s[i-1]);
+        if (s[i - 1] >= 'A' && s[i - 1] <= 'Z')
+            s[i - 1] = tolower(s[i - 1]);
         ans = ans * BASE + mint{s[i - 1], s[i - 1]};
     }
     return ans;
@@ -80,12 +81,21 @@ struct HashRepresentation
     int lastPosition;
 };
 
+//funcion para retornar el numero de pacientes en el archivo binario
+int getNumberOfAnimals()
+{
+    ifstream archivo("binaries/dataDogs.dat", ios::in | ios::binary | ios::ate);
+    int numberOfAnimals = archivo.tellg() / sizeof(Animal); //Hallamos el número de registros en el archivo
+    archivo.close();
+    return numberOfAnimals;
+}
+
 //Función que, dado un index (posición en el archivo), carga la estructura correspondiente en memoria y devuelve un puntero a la misma
 Animal *recoverAnimalInIndex(int itemNum)
 {
     struct Animal *m;
     m = (Animal *)malloc(sizeof(Animal));
-    ifstream archivo("binaries/animals_array.bin", ios::in | ios::binary | ios::ate);
+    ifstream archivo("binaries/dataDogs.dat", ios::in | ios::binary | ios::ate);
     int numberOfAnimals = archivo.tellg() / sizeof(Animal); //Hallamos el número de registros en el archivo
     if (itemNum >= numberOfAnimals)
     {
@@ -157,16 +167,16 @@ float getAndVerifyFloat()
 string getAndVerifyString(int strLenght)
 {
     string str = "";
-    cin >> str;
+    getline(cin, str);
+    cin.clear();
     clearConsole();
 
     //El valor debe ser menor a la longitud dada
     while (!cin.good() || str.length() > strLenght || str.length() == 0)
     {
-        cout << "Por favor digite un nombre de no más de " << strLenght << "carácteres: ";
+        cout << "Por favor, digite un nombre de no más de " << strLenght << " carácteres: ";
         cin.clear();
-        cin.ignore(INT_MAX, '\n');
-        cin >> str;
+        getline(cin, str);
 
         clearConsole();
     }
@@ -231,7 +241,7 @@ void addAnimal()
     Animal newAnimal = readNewAnimal();
     mint newAnimalKey = hashString(newAnimal.name);
 
-    fstream archivo("binaries/animals_array.bin", ios::in | ios::out | ios::binary);
+    fstream archivo("binaries/dataDogs.dat", ios::in | ios::out | ios::binary);
 
     //Determinar id de registro a agregar
     archivo.seekg(0, archivo.end);
@@ -349,24 +359,23 @@ void searchAnimalByID()
 
     if (userSelection == "s" || userSelection == "S")
     {
-
         //Se establece un string para pasar por consola que cree el archivo
         //Si ya existe un archivo con el mismo nombre no ocurrira nada
         string filename = "reports/" + to_string(recordOfAnimal->id) + "file.txt";
         string sysout = "touch " + filename;
 
         //Se establece una variable del tipo indicado para pasar a la funcion system
-        const char *c = sysout.c_str();
+        const char *systemChar = sysout.c_str();
 
         //Se ejecuta el comando
-        system(c);
+        system(systemChar);
 
         //Se sigue el procedimiento anterior esta vez para crear el archivo
         sysout = "nano " + filename;
 
-        c = sysout.c_str();
+        systemChar = sysout.c_str();
 
-        system(c);
+        system(systemChar);
 
         clearConsole();
 
@@ -389,7 +398,8 @@ void searchAnimalByName()
 
     cout << "Digite el nombre a buscar: ";
 
-    cin >> nameOfAnimal;
+    cin.ignore();
+    getline(cin,nameOfAnimal);
 
     //Si se llega al final del mapa significa que no hay tal nombre registrado en el archivo
     if (firstPositionOfHash.find(hashString(nameOfAnimal)) == firstPositionOfHash.end())
@@ -403,7 +413,6 @@ void searchAnimalByName()
 
         //Se establece una pausa hasta que el usuario presione enter
         cin.ignore();
-        cin.get();
 
         return;
     }
@@ -417,15 +426,15 @@ void searchAnimalByName()
 
     //Se crea un apuntador de tipo struct Animal para guardar cada estructura del archivo cuyo nombre es
     //el que se busca, de tal forma que solo se cargue en memoria esta estructura durante el proceso
-    struct Animal *record;    
+    struct Animal *record;
 
     //Se ejecuta un while que corre mientras aun halla mas estructuras cuyos nombres tienen el mismo hash
     while (true)
     {
         //Se toma la estructura actual en la que estamos
-        record = recoverAnimalInIndex(recordPosition);        
-        
-        printAnimal(record);        
+        record = recoverAnimalInIndex(recordPosition);
+
+        printAnimal(record);
 
         //Se cambia la posicion a la siguiente con el mismo hash
         recordPosition = record->nextWithSameHash;
@@ -444,7 +453,6 @@ void searchAnimalByName()
 
     //Se establece una pausa hasta que el usuario presione enter
     cin.ignore();
-    cin.get();
 }
 
 //Función para la opción 4 de borrar un registro
@@ -482,7 +490,7 @@ void deleteAnimalWithID()
     mint AnimalKey = hashString(recordToDelete->name);
 
     //Se inicializa un archivo de inscripcion y lectura binario
-    fstream archivo("binaries/animals_array.bin", ios::in | ios::out | ios::binary);
+    fstream archivo("binaries/dataDogs.dat", ios::in | ios::out | ios::binary);
 
     //Se guardan el index de las estructuras siguiente y anterior con el mismo hash
     int recordToDeleteNexthash = recordToDelete->nextWithSameHash;
@@ -570,10 +578,10 @@ void deleteAnimalWithID()
     string sysstrg = "rm ./reports/" + to_string(animalIDtoDelete) + "file.txt";
 
     //Se declara el tipo de variable para pasar a la funcion system()
-    const char *c = sysstrg.c_str();
+    const char *systemChar = sysstrg.c_str();
 
     //Se ejecuta el comando
-    system(c);
+    system(systemChar);
 
     clearConsole();
 

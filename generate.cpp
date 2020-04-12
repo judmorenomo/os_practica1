@@ -56,7 +56,8 @@ mint hashString(string s)
     mint ans = ZERO;
     for (int i = 1; i < s.length() + 1; i++)
     {
-        if(s[i-1] >= 'A' && s[i-1] <= 'Z')s[i-1] = tolower(s[i-1]);
+        if (s[i - 1] >= 'A' && s[i - 1] <= 'Z')
+            s[i - 1] = tolower(s[i - 1]);
         ans = ans * BASE + mint{s[i - 1], s[i - 1]};
     }
     return ans;
@@ -92,7 +93,7 @@ int saveAnimals(void *arr)
     FILE *apFile;
     int r;
     string auxi = "";
-    apFile = fopen("binaries/animals_array.bin", "w+");
+    apFile = fopen("binaries/dataDogs.dat", "w+");
     if (apFile == NULL)
     {
         perror("error fopen:");
@@ -141,7 +142,7 @@ int saveHashes(void *arr)
 
 void generateAnimals()
 {
-    int id = 1;    
+    int id = 1;
     for (int i = 0; i < numberOfAnimalsToGenerate; i++)
     {
         int indexOfAnimal = generateInteger(0, 3);
@@ -171,10 +172,10 @@ void generateAnimals()
 
         animalsArray[i] = newMascot;
 
-        transform(name.begin(),name.end(),name.begin(),[](unsigned char c){return tolower(c);});
+        transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return tolower(c); });
 
         mint nameHash = hashString(name);
-        
+
         if (firstPositionOfHash.find(nameHash) == firstPositionOfHash.end())
         {
             firstPositionOfHash[nameHash] = i;
@@ -189,7 +190,7 @@ void generateAnimals()
             animalsArray[indexOfLastOne].nextWithSameHash = indexOfNewLastOne;
             animalsArray[indexOfNewLastOne].previousWithSameHash = indexOfLastOne;
             lastPositionOfHash[nameHash] = indexOfNewLastOne;
-        }        
+        }
         id++;
     }
 }
@@ -212,7 +213,8 @@ void readNames()
 void generateHashesArray()
 {
     map<mint, int>::iterator it = firstPositionOfHash.begin();
-    for(; it != firstPositionOfHash.end(); it++){
+    for (; it != firstPositionOfHash.end(); it++)
+    {
         int firstKey = it->first.first, secondKey = it->first.second, firstPosition = it->second;
         int lastPosition = lastPositionOfHash[{firstKey, secondKey}];
         hashesArray[numberOfHashes++] = {firstKey, secondKey, firstPosition, lastPosition};
@@ -229,5 +231,5 @@ int main()
     generateAnimals();
     generateHashesArray();
     saveAnimals(animalsArray);
-    saveHashes(hashesArray);    
+    saveHashes(hashesArray);
 }
