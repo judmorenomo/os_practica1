@@ -56,7 +56,6 @@ mint hashString(string s)
     mint ans = ZERO;
     for (int i = 1; i < s.length() + 1; i++)
     {
-        s[i-1] = tolower(s[i-1]);
         ans = ans * BASE + mint{s[i - 1], s[i - 1]};
     }
     return ans;
@@ -92,7 +91,7 @@ int saveAnimals(void *arr)
     FILE *apFile;
     int r;
     string auxi = "";
-    apFile = fopen("binaries/animals_array.bin", "w+");
+    apFile = fopen("binaries/dataDogs.dat", "w+");
     if (apFile == NULL)
     {
         perror("error fopen:");
@@ -141,7 +140,8 @@ int saveHashes(void *arr)
 
 void generateAnimals()
 {
-    int id = 1;    
+    int id = 1;
+    cout << numberOfAnimalsToGenerate;
     for (int i = 0; i < numberOfAnimalsToGenerate; i++)
     {
         int indexOfAnimal = generateInteger(0, 3);
@@ -223,11 +223,10 @@ int main()
 {
     freopen("in.txt", "r", stdin);
     //freopen("out.txt", "w", stdout);
-    system("rm -r reports && mkdir reports");
     getNumberOfAnimalsToRead();
     readNames();
     generateAnimals();
     generateHashesArray();
     saveAnimals(animalsArray);
-    saveHashes(hashesArray);    
+    saveHashes(hashesArray);
 }

@@ -1,3 +1,4 @@
+#include <bits/stdc++.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -6,9 +7,6 @@
 #include <limits>
 #include <fstream>
 #include <iostream>
-#include <map>
-#include <climits>
-#include <algorithm>
 using namespace std;
 
 //Tipo de dato para el key de los registros
@@ -16,12 +14,6 @@ typedef pair<int, int> mint;
 
 //Declaración de las dos tablas hash a ser usadas
 map<mint, int> firstPositionOfHash, lastPositionOfHash;
-
-//Función para limpiar la consola
-void clearConsole()
-{
-    system("clear");
-}
 
 //Estructura de un registro
 struct Animal
@@ -39,9 +31,9 @@ struct Animal
 };
 
 //Función para imprimir un registro
-int printAnimal(struct Animal *data)
+void printAnimal(struct Animal *data)
 {
-    printf("|%10d|%32s|%32s|%10d|%16s|%10d|%12.1f|%4c|\n", data->id, data->name, data->type, data->age, data->race, data->height, data->weight, data->sex);
+    printf("\n|%-10i|%-32s|%-32s\t|%-10i|%-16s\t|%-10i|%-12f|%-4c|", data->id, data->name, data->type, data->age, data->race, data->height, data->weight, data->sex);
 }
 
 //Declaraciones y operaciones para generación del key compuesto final
@@ -65,8 +57,6 @@ mint hashString(string s)
     mint ans = ZERO;
     for (int i = 1; i < s.length() + 1; i++)
     {
-        if (s[i - 1] != ' ' && !(s[i - 1] >= 'a' && s[i - 1] <= 'z'))
-            s[i - 1] = tolower(s[i - 1]);
         ans = ans * BASE + mint{s[i - 1], s[i - 1]};
     }
     return ans;
@@ -81,20 +71,32 @@ struct HashRepresentation
     int lastPosition;
 };
 
+//funcion para retornar el numero de pacientes en el archivo binario
+int getNumberOfAnimals()
+{
+    ifstream archivo("binaries/dataDogs.dat", ios::in | ios::binary | ios::ate);
+    int numberOfAnimals = archivo.tellg() / sizeof(Animal); //Hallamos el número de registros en el archivo
+    archivo.close();
+    return numberOfAnimals;
+}
+
 //Función que, dado un index (posición en el archivo), carga la estructura correspondiente en memoria y devuelve un puntero a la misma
 Animal *recoverAnimalInIndex(int itemNum)
 {
     struct Animal *m;
     m = (Animal *)malloc(sizeof(Animal));
-    ifstream archivo("binaries/animals_array.bin", ios::in | ios::binary | ios::ate);
+    ifstream archivo("binaries/dataDogs.dat", ios::in | ios::binary | ios::ate);
     int numberOfAnimals = archivo.tellg() / sizeof(Animal); //Hallamos el número de registros en el archivo
     if (itemNum >= numberOfAnimals)
     {
+
         m->id = -1;
+
         return m;
     }
     archivo.seekg(sizeof(Animal) * itemNum, ios::beg);
     archivo.read((char *)m, sizeof(Animal));
+    archivo.close();
     return m;
 }
 
@@ -119,17 +121,17 @@ int getAndVerifyInt()
 {
     int num;
     cin >> num;
-    clearConsole();
+    system("clear");
 
     //El valor debe ser un int válido mayor a cero
     while (!cin.good() || num <= 0)
     {
-        cout << "Por favor digite un número entero mayor a cero: ";
+        cout << "Por favor, digite un número entero mayor a cero: ";
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         cin >> num;
 
-        clearConsole();
+        system("clear");
     }
     return num;
 }
@@ -139,7 +141,7 @@ float getAndVerifyFloat()
 {
     float num;
     cin >> num;
-    clearConsole();
+    system("clear");
 
     //El valor debe ser un float válido mayor a cero
     while (!cin.good() || num <= 0.0)
@@ -149,7 +151,7 @@ float getAndVerifyFloat()
         cin.ignore(INT_MAX, '\n');
         cin >> num;
 
-        clearConsole();
+        system("clear");
     }
     return num;
 }
@@ -158,51 +160,52 @@ float getAndVerifyFloat()
 string getAndVerifyString(int strLenght)
 {
     string str = "";
-    cin >> str;
-    clearConsole();
+    getline(cin,str);
+    cin.clear();
+    system("clear");
 
     //El valor debe ser menor a la longitud dada
     while (!cin.good() || str.length() > strLenght || str.length() == 0)
     {
-        cout << "Por favor digite un nombre de no más de " << strLenght << "carácteres: ";
+        cout << "Por favor, digite un nombre de no más de " << strLenght << " carácteres: ";
         cin.clear();
-        cin.ignore(INT_MAX, '\n');
-        cin >> str;
+        getline(cin,str);
 
-        clearConsole();
+        system("clear");
     }
     return str;
 }
 
-//Función que decide si un input para el sexo es válido
-bool animalSexInputIsValid(string input)
+char getAndVerifySex()
 {
-    return input == "f" || input == "F" || input == "m" || input == "M";
-}
+    char sex;
+    cin >> sex;
+    system("clear");
 
-//Función que solicita y verifica input del sexo por parte del usuario
-char getAndVerifyAnimalSexInput()
-{
-    string input = " ";
-
-    while (!animalSexInputIsValid(input))
+    while (!cin.good() || (sex != 'm' && sex != 'M' && sex != 'f' && sex != 'F'))
     {
-        cout << "Por favor ingrese 'F' o 'M' únicamente: " << endl;
-        cin >> input;
-        clearConsole();
+        cout << "Por favor, ingrese 'F' o 'M' únicamente: " << endl;
+
+        cin.clear();
+        cin.ignore(INT_MAX, '\n');
+        cin >> sex;
+
+        system("clear");
     }
-    return input[0];
+    return sex;
 }
 
-//Función que solicita los atributos de un animal y lo retorna
-Animal readNewAnimal()
+//Función para la opción 1 de agregar un registro
+void addAnimal()
 {
     struct Animal newAnimal;
 
     //Se recibe el input del usuario para inicializar los valores del registro
     cout << "Digite el nombre de la mascota: " << endl;
+    cin.ignore(INT_MAX, '\n');
     strcpy(newAnimal.name, getAndVerifyString(32).c_str());
     string newAnimalNameLowercase = newAnimal.name;
+    transform(newAnimalNameLowercase.begin(), newAnimalNameLowercase.end(), newAnimalNameLowercase.begin(), [](unsigned char c) { return tolower(c); });
 
     cout << "Digite la especie: " << endl;
     strcpy(newAnimal.type, getAndVerifyString(32).c_str());
@@ -211,7 +214,7 @@ Animal readNewAnimal()
     strcpy(newAnimal.race, getAndVerifyString(16).c_str());
 
     cout << "Digite el sexo: " << endl;
-    newAnimal.sex = getAndVerifyAnimalSexInput();
+    newAnimal.sex = getAndVerifySex();
 
     cout << "Digite la edad: " << endl;
     newAnimal.age = getAndVerifyInt();
@@ -222,17 +225,11 @@ Animal readNewAnimal()
     cout << "Digite el peso: " << endl;
     newAnimal.weight = getAndVerifyFloat();
 
-    return newAnimal;
-    clearConsole();
-}
+    system("clear");
 
-//Función para la opción 1 de agregar un registro
-void addAnimal()
-{
-    Animal newAnimal = readNewAnimal();
-    mint newAnimalKey = hashString(newAnimal.name);
+    mint newAnimalKey = hashString(newAnimalNameLowercase);
 
-    fstream archivo("binaries/animals_array.bin", ios::in | ios::out | ios::binary);
+    fstream archivo("binaries/dataDogs.dat", ios::in | ios::out | ios::binary);
 
     //Determinar id de registro a agregar
     archivo.seekg(0, archivo.end);
@@ -244,7 +241,7 @@ void addAnimal()
     newAnimal.nextWithSameHash = -1;
 
     //Determinar puntero a registro anterior del registro nuevo
-    if (lastPositionOfHash.find(newAnimalKey) != lastPositionOfHash.end())
+    if (lastPositionOfHash[newAnimalKey] != (int)NULL)
     { //Ya existe una estructura con el mismo hash
         //Determinar puntero a registro anterior del registro nuevo para que apunte al último registro previo
         newAnimal.previousWithSameHash = lastPositionOfHash[newAnimalKey];
@@ -277,7 +274,7 @@ void addAnimal()
 
     archivo.close();
 
-    cout << "Se guardó el registro del nuevo animal con exito" << endl;
+    cout << "Se guardo el registro del nuevo animal con exito" << endl;
 
     cout << "\nPresione ENTER para regresar al menú principal" << endl;
 
@@ -286,31 +283,13 @@ void addAnimal()
     cin.get();
 }
 
-//Función que imprime los nombres de las columnas al mostrar registros
-void printShowAnimalsHeader()
-{
-    printf("|%4s%s%4s|%13s%s%13s|%14s%s%14s|%3s%s%3s|%6s%s%6s|%2s%s%2s|%4s%s%4s|%s|\n",
-           " ", "ID", " ",
-           " ", "Nombre", " ",
-           " ", "Tipo", " ",
-           " ", "Edad", " ",
-           " ", "Raza", " ",
-           " ", "Altura", " ",
-           " ", "Peso", " ",
-           "Sexo");
-}
-
-//Verificar si el input de yes/no del usuario es correcto
-bool userYesNoInputIsValid(string input)
-{
-    return input == "n" || input == "N" || input == "s" || input == "S";
-}
-
 //Función para la opción 2 de buscar un registro por ID
 void searchAnimalByID()
 {
     //Se pide y se registra el ID del paciente a buscar
     int IDofAnimalToSearch;
+    int numberOfAnimalinRecord = getNumberOfAnimals();
+    cout << "El numero de animales archivados es: " << numberOfAnimalinRecord << endl;
     cout << "Digite el ID del paciente a buscar: ";
     IDofAnimalToSearch = getAndVerifyInt();
 
@@ -321,6 +300,7 @@ void searchAnimalByID()
     //Si la ID de la estructura es negativa significa que no está dicho animal en el registro
     if (recordOfAnimal->id == -1)
     {
+
         cout << "No existe animal registrado con ese ID" << endl;
 
         free(recordOfAnimal);
@@ -334,48 +314,62 @@ void searchAnimalByID()
         return;
     }
 
-    //El usuario puede decidir si regresar al menú o abrir el archivo
-    //Si ingresa un valor distinto se le pedira que ingrese un valor correcto y se mantendra el menú
-    string userSelection = "";
-    while (!userYesNoInputIsValid(userSelection))
+    //Se establece un while para el menú de decisión del usuario
+    while (true)
     {
-        printShowAnimalsHeader();
+
+        cout << "Se encontro el siguiente paciente: " << endl;
+
+        cout << "|    ID    |            Nombre              |                Tipo               |   Edad   |        Raza        |  Altura  |    Peso    |Sexo|";
         printAnimal(recordOfAnimal);
-        cout << "\n\n¿Desea abrir el registro médico del paciente? S/N" << endl;
 
-        cout << "Por favor ingrese sólo S o N\n";
+        //El usuario puede decidir si regresar al menú o abrir el archivo
+        //Si ingresa un valor distinto se le pedira que ingrese un valor correcto y se mantendra el menú
+        cout << "\n\n¿Desea abrir el registro medico del paciente? S/N" << endl;
+
+        string userSelection = "";
+
         cin >> userSelection;
-        clearConsole();
-    }
 
-    if (userSelection == "s" || userSelection == "S")
-    {
+        if (userSelection == "n" || userSelection == "N")
+        {
+            break;
+        }
+        else if (userSelection == "s" || userSelection == "S")
+        {
 
-        //Se establece un string para pasar por consola que cree el archivo
-        //Si ya existe un archivo con el mismo nombre no ocurrira nada
-        string filename = "reports/" + to_string(recordOfAnimal->id) + "file.txt";
-        string sysout = "touch " + filename;
+            //Se establece un string para pasar por consola que cree el archivo
+            //Si ya existe un archivo con el mismo nombre no ocurrira nada
+            string filename = "reports/" + to_string(recordOfAnimal->id) + "file.txt";
+            string sysout = "touch " + filename;
 
-        //Se establece una variable del tipo indicado para pasar a la funcion system
-        const char *c = sysout.c_str();
+            //Se establece una variable del tipo indicado para pasar a la funcion system
+            const char *systemChar = sysout.c_str();
 
-        //Se ejecuta el comando
-        system(c);
+            //Se ejecuta el comando
+            system(systemChar);
 
-        //Se sigue el procedimiento anterior esta vez para crear el archivo
-        sysout = "nano " + filename;
+            //Se sigue el procedimiento anterior esta vez para crear el archivo
+            sysout = "nano " + filename;
 
-        c = sysout.c_str();
+            systemChar = sysout.c_str();
 
-        system(c);
+            system(systemChar);
 
-        clearConsole();
+            system("clear");
 
-        cout << "\nPresione ENTER para regresar al menú principal" << endl;
+            cout << "\nPresione ENTER para regresar al menú principal" << endl;
 
-        //Se establece una pausa hasta que el usuario presione enter
-        cin.ignore();
-        cin.get();
+            //Se establece una pausa hasta que el usuario presione enter
+            cin.ignore();
+            cin.get();
+
+            break;
+        }
+
+        system("clear");
+
+        cout << "Por favor, Digite solo S o N" << endl;
     }
 
     //Se libera el malloc declarado en la funcion recoverAnimalInIndex()
@@ -390,13 +384,20 @@ void searchAnimalByName()
 
     cout << "Digite el nombre a buscar: ";
 
-    cin >> nameOfAnimal;
+    cin.ignore();
+    getline(cin,nameOfAnimal);
 
-    //Si se llega al final del mapa significa que no hay tal nombre registrado en el archivo
-    if (firstPositionOfHash.find(hashString(nameOfAnimal)) == firstPositionOfHash.end())
+    transform(nameOfAnimal.begin(), nameOfAnimal.end(), nameOfAnimal.begin(), [](unsigned char c) { return tolower(c); });
+
+    //Se realiza el hash del nombre y con la key se busca en la tabla cargada de las primeras posiciones
+    //en el archivo de un determinado hash
+    int recordPosition = firstPositionOfHash[hashString(nameOfAnimal)];
+
+    //Si se Pos es NULL significa que no hay tal nombre registrado en el archivo
+    if (recordPosition == (int)NULL)
     {
 
-        clearConsole();
+        system("clear");
 
         cout << "El nombre no se encuentra registrado" << endl;
 
@@ -404,23 +405,24 @@ void searchAnimalByName()
 
         //Se establece una pausa hasta que el usuario presione enter
         cin.ignore();
-        cin.get();
 
         return;
     }
 
-    clearConsole();
-    //Se realiza el hash del nombre y con la key se busca en la tabla cargada de las primeras posiciones
-    //en el archivo de un determinado hash
-    int recordPosition = firstPositionOfHash[hashString(nameOfAnimal)];
+    system("clear");
 
-    printShowAnimalsHeader();
+    //Se muestra por pantalla el encabezado de la tabla antes de mostrar los
+    //elementos de la misma
+    cout << "|    ID    |            Nombre              |                Tipo               |   Edad   |        Raza        |  Altura  |    Peso    |Sexo|";
 
     //Se crea un apuntador de tipo struct Animal para guardar cada estructura del archivo cuyo nombre es
     //el que se busca, de tal forma que solo se cargue en memoria esta estructura durante el proceso
     struct Animal *record;
 
     string recordName = "";
+
+    //Se establece una variable para contar el numero de registros
+    int numberOfRecords = 0;
 
     //Se ejecuta un while que corre mientras aun halla mas estructuras cuyos nombres tienen el mismo hash
     while (true)
@@ -430,11 +432,14 @@ void searchAnimalByName()
 
         recordName = record->name;
 
+        transform(recordName.begin(), recordName.end(), recordName.begin(), [](unsigned char c) { return tolower(c); });
+
         //Se verifica que tenga el nombre que se busca, esto porque pueden haber nombres con el mismo hash
         if (recordName == nameOfAnimal)
         {
             //Se muestra la estructura por pantalla
             printAnimal(record);
+            numberOfRecords++;
         }
 
         //Se cambia la posicion a la siguiente con el mismo hash
@@ -450,11 +455,12 @@ void searchAnimalByName()
     //Se libera el malloc declarado en la funcion recoverAnimalInIndex()
     free(record);
 
+    cout << "\nNumero de registros total: " << numberOfRecords << endl;
+
     cout << "\nPresione ENTER para regresar al menú principal" << endl;
 
     //Se establece una pausa hasta que el usuario presione enter
     cin.ignore();
-    cin.get();
 }
 
 //Función para la opción 4 de borrar un registro
@@ -492,7 +498,7 @@ void deleteAnimalWithID()
     mint AnimalKey = hashString(recordToDelete->name);
 
     //Se inicializa un archivo de inscripcion y lectura binario
-    fstream archivo("binaries/animals_array.bin", ios::in | ios::out | ios::binary);
+    fstream archivo("binaries/dataDogs.dat", ios::in | ios::out | ios::binary);
 
     //Se guardan el index de las estructuras siguiente y anterior con el mismo hash
     int recordToDeleteNexthash = recordToDelete->nextWithSameHash;
@@ -523,10 +529,10 @@ void deleteAnimalWithID()
     //Si no tiene una estructura siguiente
     else
     {
-        //Y es la primera estructura de su hash, se elimina el registro
+        //Y es la primera estructura de su hash, se inicializa la tabla a NULL
         if (firstPositionOfHash[AnimalKey] == (animalIDtoDelete - 1))
         {
-            firstPositionOfHash.erase(AnimalKey);
+            firstPositionOfHash[AnimalKey] = (int)NULL;
         }
     }
 
@@ -555,10 +561,10 @@ void deleteAnimalWithID()
     //Si no tiene una estructura anterior
     else
     {
-        //Y es la ultima estructura de su hash, se elimina el registro
+        //Y es la ultima estructura de su hash, se inicializa la tabla a NULL
         if (lastPositionOfHash[AnimalKey] == (animalIDtoDelete - 1))
         {
-            lastPositionOfHash.erase(AnimalKey);
+            lastPositionOfHash[AnimalKey] = (int)NULL;
         }
     }
 
@@ -580,12 +586,12 @@ void deleteAnimalWithID()
     string sysstrg = "rm ./reports/" + to_string(animalIDtoDelete) + "file.txt";
 
     //Se declara el tipo de variable para pasar a la funcion system()
-    const char *c = sysstrg.c_str();
+    const char *systemChar = sysstrg.c_str();
 
     //Se ejecuta el comando
-    system(c);
+    system(systemChar);
 
-    clearConsole();
+    system("clear");
 
     cout << "Se borró con éxito el elemento" << endl;
 
@@ -596,92 +602,88 @@ void deleteAnimalWithID()
     cin.get();
 }
 
-//Variables para imprimir las opciones existentes
-const int numberOfOptions = 5;
-string menuOptions[5] = {"Ingresar un paciente al registro",
-                         "Buscar un paciente por ID",
-                         "Mostrar pacientes por nombre",
-                         "Borrar un paciente con ID especifica",
-                         "Salir del programa"};
-
-//Función para imprimir el menú principal
-void printMenu()
-{
-    string mainHeader = string(15, '-') + "Bienvenido" + string(15, '-');
-    string instruction = "Por favor ingrese el número correspondiente a la opción que desea ejecutar";
-    printf("%35s\n%s\n", mainHeader.c_str(), instruction.c_str());
-    for (int i = 0; i < numberOfOptions; i++)
-    {
-        printf("(%d) %s\n\n", i + 1, menuOptions[i].c_str());
-    }
-    cout << "Por favor ingrese solo una de las opciones" << endl;
-    printf("Opción: ");
-}
-
-//Validar que la opción que ingresa el usuario exista
-bool userMenuSelectionIsValid(string selection)
-{
-    for (int i = 0; i < numberOfOptions; i++)
-    {
-        if (selection == to_string(i + 1))
-            return true;
-    }
-    return false;
-}
-
 //Función para el menú principal
 string getUserMenuSelection()
 {
     //Variable de seleccion para el menú
     string menuSelection = "";
 
-    while (!userMenuSelectionIsValid(menuSelection))
+    while (true)
     {
-        clearConsole();
-        printMenu();
+
+        cout << "---------------Bienvenido---------------" << endl;
+        cout << "\nPor favor, ingrese el numero correspondiente a la opcion que desea ejecutar" << endl;
+        cout << "\n(1) Ingresar un paciente al registro" << endl;
+        cout << "(2) Buscar un paciente por ID" << endl;
+        cout << "(3) Mostrar pacientes por nombre" << endl;
+        cout << "(4) Borrar un paciente con ID especifica" << endl;
+        cout << "(5) Salir del programa\n"
+             << endl;
+
+        cout << "Opcion: ";
+
         cin >> menuSelection;
+
+        if (menuSelection == "1" || menuSelection == "2" || menuSelection == "3" || menuSelection == "4" || menuSelection == "5")
+        {
+            break;
+        }
+        else
+        {
+            system("clear");
+            cout << "\nPor favor, digite solo una de las opciones" << endl;
+            continue;
+        }
+
+        system("clear");
     }
 
     return menuSelection;
 }
-
-//Variable que indica si el programa debe continuar
-bool working = true;
-
-//Ejecutar la operación ingresada por el usuario
-void doOperation(int userSelection)
+void mainProgram()
 {
-    clearConsole();
-    switch (userSelection)
-    {
-    case 1:
-    {
-        addAnimal();
-        break;
-    }
-    case 2:
-    {
-        searchAnimalByID();
-        break;
-    }
+    //Mientras esta variable sea true, el programa está trabajando
+    bool working = true;
 
-    case 3:
+    while (working)
     {
-        searchAnimalByName();
-        break;
-    }
-    case 4:
-    {
-        deleteAnimalWithID();
-        break;
-    }
-    case 5:
-    {
-        // Si el usuario desea cerrar el programa se establece la variable de trabajo a falso
-        working = false;
-    }
-    default:
-        return;
+        system("clear");
+
+        int integerMenuSelection = stoi(getUserMenuSelection());
+
+        system("clear");
+
+        switch (integerMenuSelection)
+        {
+        case 1:
+        {
+            addAnimal();
+            break;
+        }
+        case 2:
+        {
+            searchAnimalByID();
+            break;
+        }
+
+        case 3:
+        {
+            searchAnimalByName();
+            break;
+        }
+        case 4:
+        {
+            deleteAnimalWithID();
+            break;
+        }
+        case 5:
+        {
+            // Si el usuario desea cerrar el programa se establece la variable de trabajo a falso
+            working = false;
+        }
+        default:
+            break;
+        }
     }
 }
 
@@ -689,12 +691,7 @@ int main()
 {
     //Se lee el archivo con las tablas hash para cargarlas en memoria
     recoverHashes();
-
     //Se ejecuta el programa principal
-    //Mientras esta variable sea true, el programa está trabajando
-    while (working)
-    {
-        int integerMenuSelection = stoi(getUserMenuSelection());
-        doOperation(integerMenuSelection);
-    }
+    mainProgram();
+    return 0;
 }
