@@ -65,8 +65,7 @@ mint hashString(string s)
     mint ans = ZERO;
     for (int i = 1; i < s.length() + 1; i++)
     {
-        if (s[i - 1] != ' ' && !(s[i - 1] >= 'a' && s[i - 1] <= 'z'))
-            s[i - 1] = tolower(s[i - 1]);
+        if(s[i-1] >= 'A' && s[i-1] <= 'Z')s[i-1] = tolower(s[i-1]);
         ans = ans * BASE + mint{s[i - 1], s[i - 1]};
     }
     return ans;
@@ -429,13 +428,8 @@ void searchAnimalByName()
         record = recoverAnimalInIndex(recordPosition);
 
         recordName = record->name;
-
-        //Se verifica que tenga el nombre que se busca, esto porque pueden haber nombres con el mismo hash
-        if (recordName == nameOfAnimal)
-        {
-            //Se muestra la estructura por pantalla
-            printAnimal(record);
-        }
+        
+        printAnimal(record);        
 
         //Se cambia la posicion a la siguiente con el mismo hash
         recordPosition = record->nextWithSameHash;

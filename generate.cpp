@@ -56,7 +56,7 @@ mint hashString(string s)
     mint ans = ZERO;
     for (int i = 1; i < s.length() + 1; i++)
     {
-        s[i-1] = tolower(s[i-1]);
+        if(s[i-1] >= 'A' && s[i-1] <= 'Z')s[i-1] = tolower(s[i-1]);
         ans = ans * BASE + mint{s[i - 1], s[i - 1]};
     }
     return ans;
