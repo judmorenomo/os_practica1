@@ -417,17 +417,13 @@ void searchAnimalByName()
 
     //Se crea un apuntador de tipo struct Animal para guardar cada estructura del archivo cuyo nombre es
     //el que se busca, de tal forma que solo se cargue en memoria esta estructura durante el proceso
-    struct Animal *record;
-
-    string recordName = "";
+    struct Animal *record;    
 
     //Se ejecuta un while que corre mientras aun halla mas estructuras cuyos nombres tienen el mismo hash
     while (true)
     {
         //Se toma la estructura actual en la que estamos
-        record = recoverAnimalInIndex(recordPosition);
-
-        recordName = record->name;
+        record = recoverAnimalInIndex(recordPosition);        
         
         printAnimal(record);        
 
