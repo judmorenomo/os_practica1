@@ -219,6 +219,31 @@ void generateHashesArray()
     }
 }
 
+void saveNumberOfAnimals()
+{
+    FILE *apFile;
+    int r;
+    string auxi = "";
+    apFile = fopen("binaries/numberOfAnimals.dat", "w+");
+    if (apFile == NULL)
+    {
+        perror("error fopen:");
+        exit(-1);
+    }
+    r = fwrite(&numberOfAnimalsToGenerate, sizeof(Animal), 1, apFile);
+    if (r <= 0)
+    {
+        perror("error fwrite");
+        exit(-1);
+    }
+    r = fclose(apFile);
+    if (r < 0)
+    {
+        perror("error fclose: ");
+        exit(-1);
+    }
+}
+
 int main()
 {
     freopen("in.txt", "r", stdin);
@@ -230,4 +255,5 @@ int main()
     generateHashesArray();
     saveAnimals(animalsArray);
     saveHashes(hashesArray);
+    saveNumberOfAnimals();
 }

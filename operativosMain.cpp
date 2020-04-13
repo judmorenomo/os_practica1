@@ -84,10 +84,32 @@ struct HashRepresentation
 //funcion para retornar el numero de pacientes en el archivo binario
 int getNumberOfAnimals()
 {
-    ifstream archivo("binaries/dataDogs.dat", ios::in | ios::binary | ios::ate);
-    int numberOfAnimals = archivo.tellg() / sizeof(Animal); //Hallamos el número de registros en el archivo
+    int numberOfAnimals;
+    ifstream archivo("binaries/numberOfAnimals.dat", ios::in | ios::binary | ios::ate);
+    archivo.seekg(0, ios::beg);
+    archivo.read((char *)&numberOfAnimals, sizeof(int)); //Hallamos el número de registros en el archivo
     archivo.close();
     return numberOfAnimals;
+}
+
+void reduceNumberOfAnimals()
+{
+    int numberOfAnimals = getNumberOfAnimals();
+    numberOfAnimals--;
+    fstream archivo("binaries/numberOfAnimals.dat", ios::in | ios::out | ios::binary);
+    archivo.seekp(0, ios::beg);
+    archivo.write((char *)&numberOfAnimals, sizeof(int)); //Hallamos el número de registros en el archivo
+    archivo.close();
+}
+
+void increaseNumberOfAnimals()
+{
+    int numberOfAnimals = getNumberOfAnimals();
+    numberOfAnimals++;
+    fstream archivo("binaries/numberOfAnimals.dat", ios::in | ios::out | ios::binary);
+    archivo.seekp(0, ios::beg);
+    archivo.write((char *)&numberOfAnimals, sizeof(int)); //Hallamos el número de registros en el archivo
+    archivo.close();
 }
 
 //Función que, dado un index (posición en el archivo), carga la estructura correspondiente en memoria y devuelve un puntero a la misma
@@ -291,6 +313,9 @@ void addAnimal()
 
     cout << "\nPresione ENTER para regresar al menú principal" << endl;
 
+    //como el guardado es exitoso se aumenta el numero de registros
+    increaseNumberOfAnimals();
+
     //Se establece una pausa hasta que el usuario presione enter
     cin.ignore();
     cin.get();
@@ -319,6 +344,10 @@ bool userYesNoInputIsValid(string input)
 //Función para la opción 2 de buscar un registro por ID
 void searchAnimalByID()
 {
+    //se muestra el numero de registros actuales
+    int numberOfAnimals = getNumberOfAnimals();
+    cout << "Actualmente existen " << numberOfAnimals << " registros " << endl;
+
     //Se pide y se registra el ID del paciente a buscar
     int IDofAnimalToSearch;
     cout << "Digite el ID del paciente a buscar: ";
@@ -400,7 +429,7 @@ void searchAnimalByName()
     cout << "Digite el nombre a buscar: ";
 
     cin.ignore();
-    getline(cin,nameOfAnimal);
+    getline(cin, nameOfAnimal);
 
     //Si se llega al final del mapa significa que no hay tal nombre registrado en el archivo
     if (firstPositionOfHash.find(hashString(nameOfAnimal)) == firstPositionOfHash.end())
@@ -459,6 +488,10 @@ void searchAnimalByName()
 //Función para la opción 4 de borrar un registro
 void deleteAnimalWithID()
 {
+    //se muestra el numero de registros actuales
+    int numberOfAnimals = getNumberOfAnimals();
+    cout << "Actualmente existen " << numberOfAnimals << " registros " << endl;
+
     //Se pide y registra la ID del paciente a borrar
     int animalIDtoDelete;
     cout << "Digite el ID del paciente a borrar: ";
@@ -588,6 +621,13 @@ void deleteAnimalWithID()
 
     cout << "Se borró con éxito el elemento" << endl;
 
+    //Se reduce el numero guardado con el numero de registros totales
+    reduceNumberOfAnimals();
+
+    //se muestra el numero de registros actuales
+    numberOfAnimals = getNumberOfAnimals();
+    cout << "Actualmente existen " << numberOfAnimals << " registros " << endl;
+
     cout << "\nPresione ENTER para regresar al menú principal" << endl;
 
     //Se establece una pausa hasta que el usuario presione enter
@@ -607,7 +647,7 @@ string menuOptions[5] = {"Ingresar un paciente al registro",
 void printMenu()
 {
     string mainHeader = string(15, '-') + "Bienvenido" + string(15, '-');
-    string instruction = "Por favor ingrese el número correspondiente a la opción que desea ejecutar";
+    string instruction = "Por favor ingrese el número correspondiente a la opción que desea ejecutar \n";
     printf("%35s\n%s\n", mainHeader.c_str(), instruction.c_str());
     for (int i = 0; i < numberOfOptions; i++)
     {
