@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int MAXN = 100010;
 typedef pair<int, int> mint;
 typedef long long ll;
 
@@ -204,6 +203,7 @@ void readNames()
     string nameAux;
     while (getline(cin, nameAux))
     {
+        if(nameAux.size() == 0)continue;
         names.push_back(nameAux);
     }
 }
@@ -230,7 +230,7 @@ void saveNumberOfAnimals()
         perror("error fopen:");
         exit(-1);
     }
-    r = fwrite(&numberOfAnimalsToGenerate, sizeof(Animal), 1, apFile);
+    r = fwrite(&numberOfAnimalsToGenerate, sizeof(int), 1, apFile);
     if (r <= 0)
     {
         perror("error fwrite");
