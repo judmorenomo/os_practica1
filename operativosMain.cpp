@@ -81,35 +81,58 @@ struct HashRepresentation
     int lastPosition;
 };
 
+int totalNumberOfExistingAnimals;
 //funcion para retornar el numero de pacientes en el archivo binario
-int getNumberOfAnimals()
+void getNumberOfAnimals()
 {
-    int numberOfAnimals;
     ifstream archivo("binaries/numberOfAnimals.dat", ios::in | ios::binary | ios::ate);
     archivo.seekg(0, ios::beg);
-    archivo.read((char *)&numberOfAnimals, sizeof(int)); //Hallamos el número de registros en el archivo
+    archivo.read((char *)&totalNumberOfExistingAnimals, sizeof(int)); //Hallamos el número de registros en el archivo
     archivo.close();
-    return numberOfAnimals;
 }
 
+//Mostrar cuantos animales validos hay en el sistema
+void printNumberOfExistingAnimals()
+{
+    cout << "Actualmente existen " << totalNumberOfExistingAnimals << " registros " << endl;
+}
+
+//Guardar en el fichero la cantidad de animales que hay
+void saveNumberOfAnimals()
+{
+    FILE *apFile;
+    int r;
+    string auxi = "";
+    apFile = fopen("binaries/numberOfAnimals.dat", "w+");
+    if (apFile == NULL)
+    {
+        perror("error fopen:");
+        exit(-1);
+    }
+    r = fwrite(&totalNumberOfExistingAnimals, sizeof(int), 1, apFile);
+    if (r <= 0)
+    {
+        perror("error fwrite");
+        exit(-1);
+    }
+    r = fclose(apFile);
+    if (r < 0)
+    {
+        perror("error fclose: ");
+        exit(-1);
+    }
+}
+
+//Reducir el número de animales
 void reduceNumberOfAnimals()
-{
-    int numberOfAnimals = getNumberOfAnimals();
-    numberOfAnimals--;
-    fstream archivo("binaries/numberOfAnimals.dat", ios::in | ios::out | ios::binary);
-    archivo.seekp(0, ios::beg);
-    archivo.write((char *)&numberOfAnimals, sizeof(int)); //Hallamos el número de registros en el archivo
-    archivo.close();
+{    
+    totalNumberOfExistingAnimals--;    
 }
 
+//Incrementar el número de animales
 void increaseNumberOfAnimals()
-{
-    int numberOfAnimals = getNumberOfAnimals();
-    numberOfAnimals++;
-    fstream archivo("binaries/numberOfAnimals.dat", ios::in | ios::out | ios::binary);
-    archivo.seekp(0, ios::beg);
-    archivo.write((char *)&numberOfAnimals, sizeof(int)); //Hallamos el número de registros en el archivo
-    archivo.close();
+{    
+    totalNumberOfExistingAnimals++;    
 }
 
 //Función que, dado un index (posición en el archivo), carga la estructura correspondiente en memoria y devuelve un puntero a la misma
@@ -344,9 +367,8 @@ bool userYesNoInputIsValid(string input)
 //Función para la opción 2 de buscar un registro por ID
 void searchAnimalByID()
 {
-    //se muestra el numero de registros actuales
-    int numberOfAnimals = getNumberOfAnimals();
-    cout << "Actualmente existen " << numberOfAnimals << " registros " << endl;
+    //se muestra el numero de registros actuales    
+    printNumberOfExistingAnimals();
 
     //Se pide y se registra el ID del paciente a buscar
     int IDofAnimalToSearch;
@@ -489,8 +511,7 @@ void searchAnimalByName()
 void deleteAnimalWithID()
 {
     //se muestra el numero de registros actuales
-    int numberOfAnimals = getNumberOfAnimals();
-    cout << "Actualmente existen " << numberOfAnimals << " registros " << endl;
+    printNumberOfExistingAnimals();
 
     //Se pide y registra la ID del paciente a borrar
     int animalIDtoDelete;
@@ -625,8 +646,7 @@ void deleteAnimalWithID()
     reduceNumberOfAnimals();
 
     //se muestra el numero de registros actuales
-    numberOfAnimals = getNumberOfAnimals();
-    cout << "Actualmente existen " << numberOfAnimals << " registros " << endl;
+    printNumberOfExistingAnimals();
 
     cout << "\nPresione ENTER para regresar al menú principal" << endl;
 
@@ -716,7 +736,8 @@ void doOperation(int userSelection)
     }
     case 5:
     {
-        // Si el usuario desea cerrar el programa se establece la variable de trabajo a falso
+        // Si el usuario desea cerrar el programa se establece la variable de trabajo a falso y se guarda la cantidad de animales
+        saveNumberOfAnimals();
         working = false;
     }
     default:
@@ -728,6 +749,7 @@ int main()
 {
     //Se lee el archivo con las tablas hash para cargarlas en memoria
     recoverHashes();
+    getNumberOfAnimals();
 
     //Se ejecuta el programa principal
     //Mientras esta variable sea true, el programa está trabajando
