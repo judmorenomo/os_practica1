@@ -41,6 +41,14 @@ int mygetch()
     return ch;
 }
 
+void makePause()
+{
+    //Se establece una pausa hasta que el usuario presione alguna tecla
+    cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
+    __fpurge(stdin);
+    mygetch();
+}
+
 //Estructura de un registro
 struct Animal
 {
@@ -356,9 +364,7 @@ void addAnimal()
     increaseNumberOfAnimals();
 
     //Se establece una pausa hasta que el usuario presione alguna tecla
-    cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
-    __fpurge(stdin);
-    mygetch();
+    makePause();
 }
 
 //Función que imprime los nombres de las columnas al mostrar registros
@@ -404,9 +410,7 @@ void searchAnimalByID()
         free(recordOfAnimal);
 
         //Se establece una pausa hasta que el usuario presione alguna tecla
-        cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
-        __fpurge(stdin);
-        mygetch();
+        makePause();
 
         return;
     }
@@ -448,9 +452,7 @@ void searchAnimalByID()
         clearConsole();
 
         //Se establece una pausa hasta que el usuario presione alguna tecla
-        cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
-        __fpurge(stdin);
-        mygetch();
+        makePause();
     }
 
     //Se libera el malloc declarado en la funcion recoverAnimalInIndex()
@@ -477,9 +479,7 @@ void searchAnimalByName()
         cout << "El nombre no se encuentra registrado" << endl;
 
         //Se establece una pausa hasta que el usuario presione alguna tecla
-        cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
-        __fpurge(stdin);
-        mygetch();
+        makePause();
 
         return;
     }
@@ -517,9 +517,7 @@ void searchAnimalByName()
     free(record);
 
     //Se establece una pausa hasta que el usuario presione alguna tecla
-    cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
-    __fpurge(stdin);
-    mygetch();
+    makePause();
 }
 
 //Función para la opción 4 de borrar un registro
@@ -548,9 +546,7 @@ void deleteAnimalWithID()
         free(recordToDelete);
 
         //Se establece una pausa hasta que el usuario presione alguna tecla
-        cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
-        __fpurge(stdin);
-        mygetch();
+        makePause();
 
         return;
     };
@@ -663,9 +659,7 @@ void deleteAnimalWithID()
     printNumberOfExistingAnimals();
 
     //Se establece una pausa hasta que el usuario presione alguna tecla
-    cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
-    __fpurge(stdin);
-    mygetch();
+    makePause();
 }
 
 //Variables para imprimir las opciones existentes
