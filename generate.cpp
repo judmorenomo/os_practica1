@@ -203,7 +203,8 @@ void readNames()
     string nameAux;
     while (getline(cin, nameAux))
     {
-        if(nameAux.size() == 0)continue;
+        if (nameAux.size() == 0)
+            continue;
         names.push_back(nameAux);
     }
 }

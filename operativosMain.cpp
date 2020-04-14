@@ -9,6 +9,8 @@
 #include <map>
 #include <climits>
 #include <algorithm>
+#include <termios.h>
+#include <stdio_ext.h>
 using namespace std;
 
 //Tipo de dato para el key de los registros
@@ -21,6 +23,22 @@ map<mint, int> firstPositionOfHash, lastPositionOfHash;
 void clearConsole()
 {
     system("clear");
+}
+
+//Funcion que imita em metodo getch() de windows
+//Utilizada para realizar una pausa hasta que el usuario presione una tecla
+int mygetch()
+{
+    struct termios oldt,
+        newt;
+    int ch;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    return ch;
 }
 
 //Estructura de un registro
@@ -125,14 +143,14 @@ void saveNumberOfAnimals()
 
 //Reducir el número de animales
 void reduceNumberOfAnimals()
-{    
-    totalNumberOfExistingAnimals--;    
+{
+    totalNumberOfExistingAnimals--;
 }
 
 //Incrementar el número de animales
 void increaseNumberOfAnimals()
-{    
-    totalNumberOfExistingAnimals++;    
+{
+    totalNumberOfExistingAnimals++;
 }
 
 //Función que, dado un index (posición en el archivo), carga la estructura correspondiente en memoria y devuelve un puntero a la misma
@@ -334,14 +352,13 @@ void addAnimal()
 
     cout << "Se guardó el registro del nuevo animal con exito" << endl;
 
-    cout << "\nPresione ENTER para regresar al menú principal" << endl;
-
     //como el guardado es exitoso se aumenta el numero de registros
     increaseNumberOfAnimals();
 
-    //Se establece una pausa hasta que el usuario presione enter
-    cin.ignore();
-    cin.get();
+    //Se establece una pausa hasta que el usuario presione alguna tecla
+    cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
+    __fpurge(stdin);
+    mygetch();
 }
 
 //Función que imprime los nombres de las columnas al mostrar registros
@@ -367,7 +384,7 @@ bool userYesNoInputIsValid(string input)
 //Función para la opción 2 de buscar un registro por ID
 void searchAnimalByID()
 {
-    //se muestra el numero de registros actuales    
+    //se muestra el numero de registros actuales
     printNumberOfExistingAnimals();
 
     //Se pide y se registra el ID del paciente a buscar
@@ -386,11 +403,10 @@ void searchAnimalByID()
 
         free(recordOfAnimal);
 
-        cout << "\nPresione ENTER para regresar al menú principal" << endl;
-
-        //Se establece una pausa hasta que el usuario presione enter
-        cin.ignore();
-        cin.get();
+        //Se establece una pausa hasta que el usuario presione alguna tecla
+        cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
+        __fpurge(stdin);
+        mygetch();
 
         return;
     }
@@ -431,11 +447,10 @@ void searchAnimalByID()
 
         clearConsole();
 
-        cout << "\nPresione ENTER para regresar al menú principal" << endl;
-
-        //Se establece una pausa hasta que el usuario presione enter
-        cin.ignore();
-        cin.get();
+        //Se establece una pausa hasta que el usuario presione alguna tecla
+        cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
+        __fpurge(stdin);
+        mygetch();
     }
 
     //Se libera el malloc declarado en la funcion recoverAnimalInIndex()
@@ -450,8 +465,8 @@ void searchAnimalByName()
 
     cout << "Digite el nombre a buscar: ";
 
-    cin.ignore();
-    getline(cin, nameOfAnimal);
+    cin.ignore(INT_MAX, '\n');
+    nameOfAnimal = getAndVerifyString(32);
 
     //Si se llega al final del mapa significa que no hay tal nombre registrado en el archivo
     if (firstPositionOfHash.find(hashString(nameOfAnimal)) == firstPositionOfHash.end())
@@ -461,10 +476,10 @@ void searchAnimalByName()
 
         cout << "El nombre no se encuentra registrado" << endl;
 
-        cout << "\nPresione ENTER para regresar al menú principal" << endl;
-
-        //Se establece una pausa hasta que el usuario presione enter
-        cin.ignore();
+        //Se establece una pausa hasta que el usuario presione alguna tecla
+        cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
+        __fpurge(stdin);
+        mygetch();
 
         return;
     }
@@ -501,10 +516,10 @@ void searchAnimalByName()
     //Se libera el malloc declarado en la funcion recoverAnimalInIndex()
     free(record);
 
-    cout << "\nPresione ENTER para regresar al menú principal" << endl;
-
-    //Se establece una pausa hasta que el usuario presione enter
-    cin.ignore();
+    //Se establece una pausa hasta que el usuario presione alguna tecla
+    cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
+    __fpurge(stdin);
+    mygetch();
 }
 
 //Función para la opción 4 de borrar un registro
@@ -532,11 +547,10 @@ void deleteAnimalWithID()
         //Se libera el malloc declarado en la funcion recoverAnimalInIndex()
         free(recordToDelete);
 
-        cout << "\nPresione ENTER para regresar al menú principal" << endl;
-
-        //Se establece una pausa hasta que el usuario presione enter
-        cin.ignore();
-        cin.get();
+        //Se establece una pausa hasta que el usuario presione alguna tecla
+        cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
+        __fpurge(stdin);
+        mygetch();
 
         return;
     };
@@ -648,11 +662,10 @@ void deleteAnimalWithID()
     //se muestra el numero de registros actuales
     printNumberOfExistingAnimals();
 
-    cout << "\nPresione ENTER para regresar al menú principal" << endl;
-
-    //Se establece una pausa hasta que el usuario presione enter
-    cin.ignore();
-    cin.get();
+    //Se establece una pausa hasta que el usuario presione alguna tecla
+    cout << "\nPresione alguna tecla para regresar al menú principal" << endl;
+    __fpurge(stdin);
+    mygetch();
 }
 
 //Variables para imprimir las opciones existentes
